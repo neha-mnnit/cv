@@ -1,0 +1,150 @@
+%SUBJECT : MACHINE DESIGN LAB 2
+ %NAME : NEHA
+ %REG NO : 20203099 
+%GROUP : ME3
+
+%algorithm for theory of failures of brittle and ductile material
+clear all;
+e=input('enter strain value')
+if e<0.05
+   n1=0; %brittle material
+else
+    n1=1; %ductile material
+end
+if n1==0
+    f1= input('- 1.conservative 2.non-conservative');
+    if f1==1
+        t=1;       %brittle coulomb mohr theory
+       
+    else f1==2
+        t=2;       %modified mohr theory
+    end
+
+else n1==1
+    syt=input('enter yeilding tensile stress')
+    syc=input('enter yeilding compression stress')
+    if syt==syc
+        f2=input('- 1.conservative 2.non-conservative')
+        if f2==1
+            t=3;    %Maximum shear stress theory
+        else f2==2
+            t=4;     %Distortion Energy theory
+        end
+    else
+        t=5;        %Ductile Coulomb mohr theory
+    end
+   
+   
+    if t==1   %brittle coulomb mohr theory
+    sut=input('enter value of sut');
+    suc=input('Enter value of suc');
+    a1=input('Enter value of sigma x');
+    a2=input('Enter value of sigma y');
+    a3=input('Enter value of tau xy');
+    A=[a1 a3 0; a3 a2 0;0 0 0];
+    B=eig(A);
+    sig1=B(3,1);
+    sig2=B(2,1);
+    sig3=B(1,1);
+    if sig3>=0
+        fos=sut/sig1
+    end
+    if sig1<=0
+        fos=-suc/sig3
+    end
+    if sig3<0&&sig1>0
+        fos=1/[(sig1/sut)-(sig3/suc)]
+    end
+    end
+   
+   
+     if t==2  % modified mohr theory is used
+       
+       
+    sut=input('enter value of sut');
+    suc=input('Enter value of suc');
+    a1=input('Enter value of sigma x');
+    a2=input('Enter value of sigma y');
+    a3=input('Enter value of tauxy');
+
+    A =[a1 a3 0 ;a3 a2 0; 0 0 0];
+   
+    B = eig(A)
+   
+    sigma1 = B(3,1);
+    sigma2 = B(2,1);
+    sigma3 = B(1,1);
+   
+       if sigma3>=0
+           fos = sut/sigma1
+       end
+          if sigma1<=0
+              fos = -suc/sigma3
+          end
+         
+          if sigma3>=-sigma1 && sigma1>0
+              fos = sut/sigma1
+          end
+          if sigma3<-sigma1 && sigma1>0
+              a2 = ((suc-sut)*sigma1/(suc*sut))-(sigma3/suc);
+              fos = 1/a2
+          end
+   end
+   
+    if t==3;      %Maximum Shear stress theory
+       
+     syt=input('enter value of syt--');
+    suc=input('Enter value of suc--');
+    a1=input('Enter value of sigma x--');
+    a2=input('Enter value of sigma y--');
+    a3=input('Enter value of tauxy--');
+
+    A =[a1 a3 0 ;a3 a2 0; 0 0 0];
+     B = eig(A)
+   
+    sigma1 = B(3,1);
+    sigma2 = B(2,1);
+    sigma3 = B(1,1);
+    fos = syt/(sigma1-sigma3)
+   end
+       
+   if t==4;        %Distortion Energy Elliptic theory
+       a1=input('Enter value of sigma x');
+    a2=input('Enter value of sigma y');
+    a3=input('Enter value of tauxy');
+
+    A =[a1 a3 0 ;a3 a2 0; 0 0 0];
+   
+    B = eig(A)
+   
+    sigma1 = B(3,1);
+    sigma2 = B(2,1);
+    sigma3 = B(1,1);
+    sigmadash=(((sigma1-sigma2)^2 + (sigma2-sigma3)^2 + (sigma3-sigma1)^2)/2)^.5;  %von mises stresses
+    fos=syt/sigmadash
+   end
+     
+   if t==5             %Ductile Coulomb Mohr Theory
+      syt=input('enter value of sut');
+    syc=input('Enter value of suc');
+    a1=input('Enter value of sigma x');
+    a2=input('Enter value of sigma y');
+    a3=input('Enter value of tau xy');
+    A=[a1 a3 0; a3 a2 0;0 0 0];
+    B=eig(A);
+    sigma1=B(3,1);
+    sigma2=B(2,1);
+    sigma3=B(1,1);
+    if sigma3>=0
+        fos=syt/sigma1
+    end
+    if sigma1<=0
+        fos=-syc/sigma3
+    end
+    if sigma3<0&&sigma1>0
+        fos=1/[(sigma1/syt)-(sigma3/syc)]
+    end
+end
+       
+end
+
